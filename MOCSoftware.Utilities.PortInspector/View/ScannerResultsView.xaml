@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="MOCSoftware.Utilities.PortInspector.View.ScannerResultsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+                xmlns:Model="clr-namespace:MOCSoftware.Utilities.PortInspector.Model"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\\ApplicationResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Margin="0,1,0,-1">
+        <Label Grid.RowSpan="2" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,0,0" Target="{Binding ElementName=grdResults}" Content="_Results" />
+        <DataGrid Name="grdResults" Grid.Row="0" Margin="5,25,0,0" ItemsSource="{Binding Path=ScannerResults}" AutoGenerateColumns="False" GridLinesVisibility="None">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Host Name" Binding="{Binding HostName}" Width="*" />
+                <DataGridTextColumn Header="Host Address" Binding="{Binding HostAddress}" Width="*" />
+                <DataGridTextColumn Header="Port Number" Binding="{Binding PortNumber}" Width="*" />
+                <DataGridTextColumn Header="Protocol" Binding="{Binding Protocol}" Width="*" />
+                <DataGridTemplateColumn Header="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                            <ProgressBar IsIndeterminate="True" x:Name="pbScanning" Visibility="Collapsed" Minimum="0" Maximum="1" Height="20" Width="20" />
+                                <Image x:Name="imgOpenClosed" Visibility="Collapsed" Height="20" />
+                            </StackPanel>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Path=Status}">
+                                    <DataTrigger.Value>
+                                        <Model:ScannerResults>Scanning</Model:ScannerResults>
+                                    </DataTrigger.Value>
+                                    <Setter TargetName="pbScanning" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Status}">
+                                    <DataTrigger.Value>
+                                        <Model:ScannerResults>PortOpen</Model:ScannerResults>
+                                    </DataTrigger.Value>
+                                    <Setter TargetName="imgOpenClosed" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="imgOpenClosed" Property="Source" Value="/Images/ok-icon.png" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Status}">
+                                    <DataTrigger.Value>
+                                        <Model:ScannerResults>PortClosed</Model:ScannerResults>
+                                    </DataTrigger.Value>
+                                    <Setter TargetName="imgOpenClosed" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="imgOpenClosed" Property="Source" Value="/Images/not-ok-icon.png" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Scan Complete" Binding="{Binding IsScanComplete}" Width="*" />
+                <DataGridTextColumn Header="Scan Result" Binding="{Binding ScanResult}" Width="3*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

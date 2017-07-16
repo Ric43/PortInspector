@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="MOCSoftware.Utilities.PortInspector.View.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             xmlns:Properties="clr-namespace:MOCSoftware.Utilities.PortInspector.Properties"
+             DataContext="AboutViewModel">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\\ApplicationResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <ContentControl Style="{StaticResource DialogBody}">
+        <StackPanel>
+            <Label Content="{x:Static Properties:Resources.About_Header}" Style="{StaticResource DialogHeader}" HorizontalAlignment="Stretch" />
+            <Grid VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{x:Static Properties:Resources.About_TitleLabel}" Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Name="txtTitle" Text="{x:Static Properties:Resources.About_Title}" Style="{StaticResource ResourceKey=About}" />
+                <Label Content="{x:Static Properties:Resources.About_DescriptionLabel}" Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Name="txtDescription" Text="{x:Static Properties:Resources.About_Description}" Style="{StaticResource ResourceKey=About}" />
+                <Label Content="{x:Static Properties:Resources.About_AuthorLabel}" Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Name="txtAuthor" Text="{x:Static Properties:Resources.About_Author}" Style="{StaticResource ResourceKey=About}" />
+                <Label Content="{x:Static Properties:Resources.About_CompanyLabel}" Grid.Row="3" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Name="txtCompany" Text="{Binding Path=Company}" Style="{StaticResource ResourceKey=About}" />
+                <Label Content="{x:Static Properties:Resources.About_CopyrightLabel}" Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="4" Grid.Column="1" Name="txtCopyright" Text="{Binding Path=Copyright}" Style="{StaticResource ResourceKey=About}" />
+                <Label Content="{x:Static Properties:Resources.About_VersionLabel}" Grid.Row="5" Grid.Column="0" Style="{StaticResource ResourceKey=AboutLabel}" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Name="txtVersion" Text="{Binding Path=Version}" Style="{StaticResource ResourceKey=About}" />
+            <Button Grid.Row="6" Grid.ColumnSpan="2" Name="btnOk" Content="{x:Static Properties:Resources.MessageDialog_OkButtonText}" Command="{Binding OkCommand}" HorizontalAlignment="Center" Width="50" Margin="5,5,5,5" />
+        </Grid>
+        </StackPanel>
+    </ContentControl>
+</UserControl>

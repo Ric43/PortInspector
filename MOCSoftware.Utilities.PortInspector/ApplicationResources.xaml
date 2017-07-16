@@ -1,0 +1,365 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ViewModel="clr-namespace:MOCSoftware.Utilities.PortInspector.ViewModel"
+                    xmlns:View="clr-namespace:MOCSoftware.Utilities.PortInspector.View"
+                    xmlns:Properties="clr-namespace:MOCSoftware.Utilities.PortInspector.Properties"
+                    xmlns:Model="clr-namespace:MOCSoftware.Utilities.PortInspector.Model"
+                    xmlns:Utility="clr-namespace:MOCSoftware.Utilities.PortInspector.Utility">
+    
+    <Style TargetType="{x:Type Window}" x:Key="Main">
+        <Setter Property="MinHeight" Value="480" />
+        <Setter Property="MinWidth" Value="640" />
+    </Style>
+    
+    <DataTemplate DataType="{x:Type ViewModel:PortListViewModel}">
+        <View:PortListView />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type ViewModel:HostListViewModel}">
+        <View:HostListView />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type ViewModel:MainMenuViewModel}">
+        <View:MainMenuView />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type ViewModel:ScannerResultsViewModel}">
+        <View:ScannerResultsView />
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type ViewModel:MenuItemViewModel}" x:Key="ContextMenuTemplate">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="{Binding Header}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <Style TargetType="{x:Type MenuItem}">
+        <Setter Property="Command" Value="{Binding Command}" />
+        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+    </Style>
+
+    <HierarchicalDataTemplate x:Key="MainMenuTemplate" DataType="{x:Type ViewModel:MenuItemViewModel}" ItemsSource="{Binding Path=MenuItems}">
+        <StackPanel>
+            <Label Name="mnuiDetails" Content="{Binding Header}" />
+        </StackPanel>
+    </HierarchicalDataTemplate>
+
+    <ControlTemplate x:Key="InputControlErrorTemplate">
+        <DockPanel LastChildFill="True">
+            <Grid DockPanel.Dock="Right" Margin="5,0,0,0" ToolTip="{Binding ElementName=ValidatedControl,Path=AdornedElement.(Validation.Errors)[0].ErrorContent}">
+                <Ellipse Fill="Red" Height="20" Width="20" />
+                <TextBlock FontFamily="Georgia" FontWeight="ExtraBold" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18">!</TextBlock>
+            </Grid>
+            <Border BorderBrush="Red" BorderThickness="1">
+                <AdornedElementPlaceholder Name="ValidatedControl" />
+            </Border>
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type Label}">
+        <Setter Property="Margin" Value="0,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style x:Key="InputControlStyle" TargetType="{x:Type Control}">
+        <Setter Property="Margin" Value="5,25,5,0" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="true">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DialogInputControl" TargetType="{x:Type Control}">
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource InputControlErrorTemplate}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Width" Value="200" />
+        <Setter Property="Margin" Value="0,0,5,0" />
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="true">
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="PortGridStyle" TargetType="{x:Type DataGrid}">
+        <Setter Property="Margin" Value="5,25,5,0" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style x:Key="disablePortMenuItem" TargetType="{x:Type MenuItem}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=grdPorts,Path=SelectedIndex}" Value="-1">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <Utility:NullToBoolConverter x:Key="NullToBool" />
+
+    <LinearGradientBrush x:Key="Brush_HeaderBackground" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#66000088" Offset="0" />
+        <GradientStop Color="#BB000088" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush_MessageHeaderBackground" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#FFFF0000" Offset="0" />
+        <GradientStop Color="#FFC00000" Offset="1" />
+    </LinearGradientBrush>
+
+    <Style x:Key="DialogHeader" TargetType="{x:Type Label}">
+        <Setter Property="Background" Value="{StaticResource Brush_HeaderBackground}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Opacity" Value="1.0" />
+        <Setter Property="FontFamily" Value="Arial" />
+    </Style>
+    <Style x:Key="MessageDialogHeader" TargetType="{x:Type Label}" BasedOn="{StaticResource DialogHeader}">
+        <Setter Property="Background" Value="{StaticResource Brush_MessageHeaderBackground}" />
+    </Style>
+    
+    <Style x:Key="DialogBody" TargetType="{x:Type ContentControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Grid
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        >
+                            <Label  Background="Gray" Opacity="0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="5" />
+                            <Border Opacity="1.0"
+                        Background="{StaticResource Brush_HeaderBackground}" 
+                        BorderBrush="Black" 
+                        BorderThickness="1" 
+                        CornerRadius="5" 
+                        Margin="4" 
+                        Padding="4" 
+                        SnapsToDevicePixels="True" 
+                        Panel.ZIndex="10"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        >
+                                <ContentPresenter
+                            ContentSource="Content"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                            </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Visibility" Value="{Binding Path=IsVisible,Converter={StaticResource BoolToVisibility}}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Style.Resources>
+            <Style TargetType="{x:Type StackPanel}">
+                <Setter Property="Background" Value="AliceBlue" />
+                <Setter Property="Opacity" Value="1.0" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+            </Style>
+            <Style TargetType="{x:Type Grid}">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+        </Style.Resources>
+    </Style>
+    
+    <Style x:Key="MessageDialogBody" TargetType="{x:Type ContentControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                    <Grid
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        >
+                        <Label  Background="Gray" Opacity="0.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="10" />
+                        <Border Opacity="1.0"
+                        Background="{StaticResource Brush_MessageHeaderBackground}" 
+                        BorderBrush="DarkRed" 
+                        BorderThickness="1" 
+                        CornerRadius="5" 
+                        Margin="4" 
+                        Padding="4" 
+                        SnapsToDevicePixels="True" 
+                        Panel.ZIndex="10"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        >
+                            <ContentPresenter
+                            ContentSource="Content"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Visibility" Value="{Binding Path=IsVisible,Converter={StaticResource BoolToVisibility}}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Style.Resources>
+            <Style TargetType="{x:Type StackPanel}">
+                <Setter Property="Background" Value="Salmon" />
+                <Setter Property="Opacity" Value="1.0" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Stretch" />
+            </Style>
+            <Style TargetType="{x:Type Grid}">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="5,5,5,5" />
+            </Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+        </Style.Resources>
+    </Style>
+
+    <LinearGradientBrush x:Key="Brush_HostNameBackgroundPending" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#300000AA" Offset="0" />
+        <GradientStop Color="#600000AA" Offset="1" />
+    </LinearGradientBrush>
+
+    <DataTemplate x:Key="PortList">
+        <DataTemplate.Resources>
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+        </DataTemplate.Resources>
+        <Border Margin="0, 2, 0, 2" Padding="0,0,0,0" BorderThickness="1.0" BorderBrush="Black" HorizontalAlignment="Stretch">
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="166" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Background="{StaticResource Brush_HostNameBackgroundPending}">
+                    <CheckBox Name="chkIsSelected" IsChecked="{Binding Path=IsSelected,Mode=TwoWay}" VerticalAlignment="Center" Margin="2,0,2,0" />
+                    <Label Name="lblPortName" Content="{Binding Path=PortName}" ToolTip="{Binding Path=PortName}"  HorizontalAlignment="Stretch" Width="200" />
+                </StackPanel>
+                    <WrapPanel HorizontalAlignment="Stretch" Orientation="Horizontal" Grid.Column="0" Grid.Row="1">
+                    <Label Name="lblProtocol" Grid.Column="0" Grid.Row="1" Content="{Binding Path=Protocol}" HorizontalAlignment="Stretch" />
+                    <Label Name="lblPortNumber" Grid.Column="0" Grid.Row="1" Content="{Binding Path=PortNumber}" HorizontalAlignment="Stretch" Width="130" />
+                </WrapPanel>
+                        <TextBlock Name="tbPortDescription" Text="{Binding Path=Description}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Background="LightGray" Padding="5,2,5,2" Grid.Row="2" Margin="0,0,0,0" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="Results">
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Name="tbkHostName" Grid.Row="0" Text="{Binding Path=HostName}" />
+            <TextBlock Name="tbkHostAddress" Grid.Row="1" Text="{Binding Path=HostAddress}" />
+            <TextBlock Name="tbkHostProtocol" Grid.Row="2" Text="{Binding Path=Protocol}" />
+            <TextBlock Name="tbkHostPort" Grid.Row="3" Text="{Binding Path=PortNumber}" />
+            <TextBlock Name="tbkScanCompletionStatus" Grid.Row="4" Text="{Binding Path=IsScanComplete}" />
+            <TextBlock Name="tbkScanResult" Grid.Row="5" Text="{Binding Path=ScanResult}" />
+        </Grid>
+    </DataTemplate>
+
+    <LinearGradientBrush x:Key="Brush_HostNameBackgroundResolved" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#3000AA00" Offset="0" />
+        <GradientStop Color="#9000AA00" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush_HostNameBackgroundUnResolved" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#30AA0000" Offset="0" />
+        <GradientStop Color="#90AA0000" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush_IpAddressBackgroundPending" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#900000AA" Offset="0" />
+        <GradientStop Color="#600000AA" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush_IpAddressBackgroundResolved" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#A000AA00" Offset="0" />
+        <GradientStop Color="#6000AA00" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush_IpAddressBackgroundUnresolved" StartPoint="0,0.5" EndPoint="1,0.5">
+        <GradientStop Color="#A0AA0000" Offset="0" />
+        <GradientStop Color="#60AA0000" Offset="1" />
+    </LinearGradientBrush>
+
+    <DataTemplate x:Key="HostList">
+        <Border Margin="0, 2, 0, 2" BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Stretch" Width="158">
+            <StackPanel HorizontalAlignment="Stretch">
+                <TextBlock Text="{Binding Path=HostName}" Name="tbHostName" Background="{StaticResource Brush_HostNameBackgroundPending}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Padding="5,2,5,2" />
+                <TextBlock Text="{Binding Path=IpAddress}" Name="tbIpAddress" Background="{StaticResource Brush_IpAddressBackgroundPending}" HorizontalAlignment="Stretch" TextWrapping="Wrap" Padding="5,5,5,5" />
+            </StackPanel>
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Path=ResolverState}">
+                <DataTrigger.Value>
+                    <Model:ResolverStates>ResolutionSucceeded</Model:ResolverStates>
+                </DataTrigger.Value>
+                <Setter Property="Background" Value="{StaticResource Brush_HostNameBackgroundResolved}" TargetName="tbHostName" />
+                <Setter Property="Background" Value="{StaticResource Brush_IpAddressBackgroundResolved}" TargetName="tbIpAddress" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=ResolverState}">
+                <DataTrigger.Value>
+                    <Model:ResolverStates>ResolutionFailed</Model:ResolverStates>
+                </DataTrigger.Value>
+                <Setter Property="Background" Value="{StaticResource Brush_HostNameBackgroundUnResolved}" TargetName="tbHostName" />
+                <Setter Property="Background" Value="{StaticResource Brush_IpAddressBackgroundUnresolved}" TargetName="tbIpAddress" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+    
+    <Style TargetType="DataGridRow">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}">
+                <DataTrigger.Value>
+                    <Model:ScannerResults>Scanning</Model:ScannerResults>
+                </DataTrigger.Value>
+                <Setter Property="Background" Value="{StaticResource Brush_HostNameBackgroundPending}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}">
+                <DataTrigger.Value>
+                    <Model:ScannerResults>PortOpen</Model:ScannerResults>
+                </DataTrigger.Value>
+                <Setter Property="Background" Value="{StaticResource Brush_IpAddressBackgroundResolved}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}">
+                <DataTrigger.Value>
+                    <Model:ScannerResults>PortClosed</Model:ScannerResults>
+                </DataTrigger.Value>
+                <Setter Property="Background" Value="{StaticResource Brush_IpAddressBackgroundUnresolved}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="TextBlock" x:Key="About">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Margin" Value="5,5,5,5" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style TargetType="Label" x:Key="AboutLabel">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Margin" Value="5,0,5,5" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+</ResourceDictionary>
